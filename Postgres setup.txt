@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Update and install PostgreSQL
+sudo yum update -y
+sudo yum install -y postgresql-server postgresql-contrib
+sudo postgresql-setup --initdb
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+# Allow remote connections
+sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /var/lib/pgsql/data/postgresql.conf
+sudo echo "host    all    all    192.168.48.131/32    md5" >> /var/lib/pgsql/data/pg_hba.conf
+sudo systemctl restart postgresql
+
+# Create databases and users
+sudo -i -u postgres psql <<EOF
+CREATE DATABASE db1;
+CREATE DATABASE db2;
+
+CREATE USER user_db1 WITH PASSWORD 'password_db1';
+CREATE USER user_db2 WITH PASSWORD 'password_db2';
+
+GRANT ALL PRIVILEGES ON DATABASE db1 TO user_db1;
+GRANT ALL PRIVILEGES ON DATABASE db2 TO user_db2;
+
+ALTER USER user_db1 WITH REPLICATION SUPERUSER;
+ALTER USER user_db2 WITH REPLICATION SUPERUSER;
+EOF
+
+# Enable logical replication
+sudo sed -i "s/#wal_level = replica/wal_level = logical/g" /var/lib/pgsql/data/postgresql.conf
+sudo systemctl restart postgresql
+
+echo "PostgreSQL setup completed successfully!"

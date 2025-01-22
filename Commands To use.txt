@@ -1,0 +1,54 @@
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+bin/kafka-server-start.sh config/server.properties
+
+bin/connect-distributed.sh config/connect-distributed.properties
+
+
+
+
+curl -X DELETE http://localhost:8083/connectors/db1-connector
+curl -X DELETE http://localhost:8083/connectors/db2-connector
+curl -X DELETE http://localhost:8083/connectors/db1-sink-connector
+curl -X DELETE http://localhost:8083/connectors/db2-sink-connector
+
+curl -X POST -H "Content-Type: application/json" --data @db1-connector.json http://localhost:8083/connectors
+curl -X POST -H "Content-Type: application/json" --data @db2-connector.json http://localhost:8083/connectors
+curl -X POST -H "Content-Type: application/json" --data @db1-sink-connector.json http://localhost:8083/connectors
+curl -X POST -H "Content-Type: application/json" --data @db2-sink-connector.json http://localhost:8083/connectors
+
+
+
+curl http://localhost:8083/connectors/db1-connector/status
+
+/opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+
+
+
+curl http://localhost:8083/connectors/db1-connector/status
+curl http://localhost:8083/connectors/db2-connector/status
+curl http://localhost:8083/connectors/db1-sink-connector/status
+curl http://localhost:8083/connectors/db2-sink-connector/status
+
+
+
+/opt/kafka/bin/kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic db1.public.employees \
+  --from-beginning
+
+
+
+/opt/kafka/bin/kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic db2.public.employees \
+  --from-beginning
+
+
+
+
+CREATE TABLE employees (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    position VARCHAR(100)
+);

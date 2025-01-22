@@ -1,0 +1,17 @@
+{
+  "name": "db2-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "192.168.48.131",
+    "database.port": "5432",
+    "database.user": "user_db2",
+    "database.password": "password_db2",
+    "database.dbname": "db2",
+    "database.server.name": "dbserver2",
+    "table.include.list": "public.*",
+    "plugin.name": "pgoutput",
+    "slot.name": "db2_slot",
+    "publication.name": "db2_publication",
+    "topic.prefix": "db2"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "db1-sink-connector",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "tasks.max": "1",
+    "connection.url": "jdbc:postgresql://192.168.48.131:5432/db2",
+    "connection.user": "user_db2",
+    "connection.password": "password_db2",
+    "topics": "db1.public.employees",
+    "table.name.format": "employees",
+    "insert.mode": "upsert",
+    "pk.mode": "record_key",
+    "pk.fields": "id",
+    "auto.create": "true",
+    "auto.evolve": "true",
+    "transforms": "unwrap",
+    "transforms.unwrap.type": "org.apache.kafka.connect.transforms.ExtractField$Value",
+    "transforms.unwrap.field": "after",
+    "transforms.unwrap.drop.tombstones": "false"
+  }
+}
